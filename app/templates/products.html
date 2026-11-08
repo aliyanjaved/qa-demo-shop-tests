@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Products</h1>
+<p>Items in cart: <span data-test="cart-count">{{ count }}</span></p>
+<form method="get">
+  <input name="q" value="{{ q }}" placeholder="Search" data-test="search">
+  <button type="submit" data-test="search-button">Search</button>
+</form>
+<ul>
+{% for p in products %}
+  <li data-test="product-{{ p.id }}">
+    <span data-test="product-name">{{ p.name }}</span> - {{ "%.2f"|format(p.price) }} EUR
+    <form method="post" action="/cart/add/{{ p.id }}" style="display:inline">
+      <button type="submit" data-test="add-{{ p.id }}">Add to cart</button>
+    </form>
+  </li>
+{% else %}
+  <li data-test="no-results">No products found</li>
+{% endfor %}
+</ul>
+{% endblock %}

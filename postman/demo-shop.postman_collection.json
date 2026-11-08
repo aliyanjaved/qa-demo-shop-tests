@@ -1,0 +1,70 @@
+{
+  "info": {
+    "name": "Demo Shop API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:5000" },
+    { "key": "token", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "Login (valid)",
+      "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+        "pm.test('status is 200', () => pm.response.to.have.status(200));",
+        "pm.test('token returned', () => pm.expect(pm.response.json().token).to.be.a('string'));",
+        "pm.collectionVariables.set('token', pm.response.json().token);"
+      ]}}],
+      "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": { "mode": "raw", "raw": "{\"username\":\"standard_user\",\"password\":\"secret123\"}" },
+        "url": "{{baseUrl}}/api/login" }
+    },
+    {
+      "name": "Login (wrong password)",
+      "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+        "pm.test('status is 401', () => pm.response.to.have.status(401));"
+      ]}}],
+      "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": { "mode": "raw", "raw": "{\"username\":\"standard_user\",\"password\":\"wrong\"}" },
+        "url": "{{baseUrl}}/api/login" }
+    },
+    {
+      "name": "List products",
+      "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+        "pm.test('status is 200', () => pm.response.to.have.status(200));",
+        "pm.test('list is not empty', () => pm.expect(pm.response.json().products.length).to.be.above(0));"
+      ]}}],
+      "request": { "method": "GET", "url": "{{baseUrl}}/api/products" }
+    },
+    {
+      "name": "Search is case-insensitive (BUG-001)",
+      "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+        "pm.test('backpack found with lowercase query', () => pm.expect(pm.response.json().products.length).to.eql(1));"
+      ]}}],
+      "request": { "method": "GET", "url": "{{baseUrl}}/api/products?q=backpack" }
+    },
+    {
+      "name": "Add 3 x Bike Light to cart",
+      "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+        "pm.test('status is 201', () => pm.response.to.have.status(201));",
+        "pm.test('total respects quantity (BUG-002)', () => pm.expect(pm.response.json().total).to.eql(29.97));"
+      ]}}],
+      "request": { "method": "POST", "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{token}}" }],
+        "body": { "mode": "raw", "raw": "{\"product_id\":2,\"quantity\":3}" },
+        "url": "{{baseUrl}}/api/cart" }
+    },
+    {
+      "name": "Checkout without address (BUG-003)",
+      "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+        "pm.test('status is 400', () => pm.response.to.have.status(400));"
+      ]}}],
+      "request": { "method": "POST", "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{token}}" }],
+        "body": { "mode": "raw", "raw": "{\"name\":\"Ali\",\"address\":\"\"}" },
+        "url": "{{baseUrl}}/api/checkout" }
+    }
+  ]
+}

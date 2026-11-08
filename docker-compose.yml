@@ -1,0 +1,20 @@
+services:
+  app:
+    build: ./app
+    environment:
+      SEEDED_BUGS: ${SEEDED_BUGS:-false}
+    ports:
+      - "5000:5000"
+
+  tests:
+    build:
+      context: .
+      dockerfile: Dockerfile.tests
+    profiles: ["test"]
+    depends_on:
+      app:
+        condition: service_healthy
+    environment:
+      BASE_URL: http://app:5000
+    volumes:
+      - ./reports:/work/reports

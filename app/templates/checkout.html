@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Checkout</h1>
+{% if order %}
+<p data-test="order-confirmation">Thank you! Order #{{ order.order_id }} - total {{ "%.2f"|format(order.total) }} EUR</p>
+{% else %}
+{% if error %}<p data-test="checkout-error" role="alert">{{ error }}</p>{% endif %}
+<p>Total: <span data-test="checkout-total">{{ "%.2f"|format(total) }}</span> EUR</p>
+<form method="post">
+  <label>Name <input name="name" data-test="name"></label><br>
+  <label>Address <input name="address" data-test="address"></label><br>
+  <button type="submit" data-test="place-order">Place order</button>
+</form>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Cart</h1>
+{% if lines %}
+<ul>
+{% for l in lines %}
+  <li data-test="cart-line-{{ l.product_id }}">{{ l.name }} x <span data-test="qty-{{ l.product_id }}">{{ l.quantity }}</span>
+    <form method="post" action="/cart/remove/{{ l.product_id }}" style="display:inline">
+      <button type="submit" data-test="remove-{{ l.product_id }}">Remove</button>
+    </form>
+  </li>
+{% endfor %}
+</ul>
+<p>Total: <span data-test="cart-total">{{ "%.2f"|format(total) }}</span> EUR</p>
+<a href="/checkout" data-test="checkout-link">Checkout</a>
+{% else %}
+<p data-test="cart-empty">Your cart is empty</p>
+{% endif %}
+{% endblock %}
